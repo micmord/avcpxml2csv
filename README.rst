@@ -1,5 +1,5 @@
-avcpxml2html
-============
+avcpxml2csv
+===========
 
 Semplice programma per la conversione in CSV del file XML aderente alle specifiche tecniche
 di `AVCP`__ in ottemperanza a Art.1,comma 32,L.190/2012 (anticorruzione).
