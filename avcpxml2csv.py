@@ -36,6 +36,7 @@ import re
 CODIFICA_XML_SORGENTE='utf-8'
 DELIMITER=';'
 QUOTECHAR='"'
+ESCAPE="'"
 ND = 'n/d'
 
 
@@ -105,7 +106,7 @@ for lotto in lotti.iter('lotto'):
   headerRow = QUOTECHAR + lotto.find('strutturaProponente').find('denominazione').text + QUOTECHAR + DELIMITER
   headerRow += QUOTECHAR + lotto.find('strutturaProponente').find('codiceFiscaleProp').text + QUOTECHAR + DELIMITER
   headerRow += QUOTECHAR + lotto.find('cig').text + QUOTECHAR + DELIMITER
-  headerRow += QUOTECHAR + lotto.find('oggetto').text + QUOTECHAR + DELIMITER
+  headerRow += QUOTECHAR + lotto.find('oggetto').text.replace(QUOTECHAR,ESCAPE) + QUOTECHAR + DELIMITER
   headerRow += QUOTECHAR + lotto.find('sceltaContraente').text + QUOTECHAR + DELIMITER
   headerRow += QUOTECHAR + lotto.find('importoAggiudicazione').text + QUOTECHAR + DELIMITER
   headerRow += QUOTECHAR + lotto.find('importoSommeLiquidate').text + QUOTECHAR + DELIMITER
@@ -142,9 +143,8 @@ for lotto in lotti.iter('lotto'):
   # se presenti li scrivo
   if ((partecipanti.find('partecipante') is not None) or (partecipanti.find('raggruppamento') is not None)):  
     dizionarioPartecipanti = {}
-    #if ((partecipanti.find('partecipante') is not None) or (partecipanti.find('raggruppamento') is not None)):
     for partecipante in partecipanti.iter('partecipante'):
-      row = headerRow + QUOTECHAR + partecipante.find('ragioneSociale').text + QUOTECHAR + DELIMITER
+      row = headerRow + QUOTECHAR + partecipante.find('ragioneSociale').text.replace(QUOTECHAR,ESCAPE) + QUOTECHAR + DELIMITER
       if (partecipante.find('codiceFiscale') is not None):
         cf = partecipante.find('codiceFiscale').text
         row += QUOTECHAR + cf + QUOTECHAR + DELIMITER
@@ -166,7 +166,7 @@ for lotto in lotti.iter('lotto'):
     for raggruppamento in partecipanti.iter('raggruppamento'):
       r += 1 
       for membro in raggruppamento.iter('membro'):
-        row = headerRow + QUOTECHAR + membro.find('ragioneSociale').text + QUOTECHAR + DELIMITER
+        row = headerRow + QUOTECHAR + membro.find('ragioneSociale').text.replace(QUOTECHAR,ESCAPE) + QUOTECHAR + DELIMITER
         if (membro.find('codiceFiscale') is not None):
           cf = membro.find('codiceFiscale').text
           row += QUOTECHAR + cf + QUOTECHAR + DELIMITER
