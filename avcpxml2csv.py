@@ -24,7 +24,7 @@ Specifiche XML:
 Tested with Python 2.7
 
 @author: Michele Mordenti
-@version: 0.0.1
+@version: 0.1
 '''
 
 import sys
@@ -84,32 +84,31 @@ root = tree.getroot()
 metadata = root.find('metadata')
 
 # Heder CSV
-foutput.write(QUOTECHAR + 'Proponente' + QUOTECHAR + DELIMITER +
+foutput.write(QUOTECHAR + 'CIG' + QUOTECHAR + DELIMITER +
+              QUOTECHAR + 'Proponente' + QUOTECHAR + DELIMITER +
               QUOTECHAR + 'Codice Fiscale' + QUOTECHAR + DELIMITER +
-              QUOTECHAR + 'CIG' + QUOTECHAR + DELIMITER +
               QUOTECHAR + 'Oggetto' + QUOTECHAR + DELIMITER +
               QUOTECHAR + 'Scelta contraente' + QUOTECHAR + DELIMITER +
-              QUOTECHAR + 'Importo' + QUOTECHAR + DELIMITER +
-              QUOTECHAR + 'Liquidato' + QUOTECHAR + DELIMITER +
-              QUOTECHAR + 'Data inizio' + QUOTECHAR + DELIMITER +
-              QUOTECHAR + 'Data fine' + QUOTECHAR + DELIMITER +
               QUOTECHAR + 'Ditta partecipante' + QUOTECHAR + DELIMITER +
               QUOTECHAR + 'Codice Fiscale' + QUOTECHAR + DELIMITER +
               QUOTECHAR + 'ITA' + QUOTECHAR + DELIMITER +
               QUOTECHAR + 'Raggruppamento' + QUOTECHAR + DELIMITER +
               QUOTECHAR + 'Ruolo' + QUOTECHAR + DELIMITER +
-              QUOTECHAR + 'Aggiudicatario' + QUOTECHAR + '\n')
+              QUOTECHAR + 'Aggiudicatario' + QUOTECHAR + DELIMITER +
+              QUOTECHAR + 'Importo' + QUOTECHAR + DELIMITER +
+              QUOTECHAR + 'Data inizio' + QUOTECHAR + DELIMITER +
+              QUOTECHAR + 'Data fine' + QUOTECHAR + DELIMITER +
+              QUOTECHAR + 'Liquidato' + QUOTECHAR + DELIMITER + '\n')
 
 lotti = root.find('data')
 # Ciclo principale su tutti i lotti
 for lotto in lotti.iter('lotto'):
-  headerRow = QUOTECHAR + lotto.find('strutturaProponente').find('denominazione').text + QUOTECHAR + DELIMITER
+  headerRow = QUOTECHAR + lotto.find('cig').text + QUOTECHAR + DELIMITER
+  headerRow += QUOTECHAR + lotto.find('strutturaProponente').find('denominazione').text + QUOTECHAR + DELIMITER
   headerRow += QUOTECHAR + lotto.find('strutturaProponente').find('codiceFiscaleProp').text + QUOTECHAR + DELIMITER
-  headerRow += QUOTECHAR + lotto.find('cig').text + QUOTECHAR + DELIMITER
   headerRow += QUOTECHAR + lotto.find('oggetto').text.replace(QUOTECHAR,ESCAPE) + QUOTECHAR + DELIMITER
   headerRow += QUOTECHAR + lotto.find('sceltaContraente').text + QUOTECHAR + DELIMITER
-  headerRow += QUOTECHAR + lotto.find('importoAggiudicazione').text + QUOTECHAR + DELIMITER
-  headerRow += QUOTECHAR + lotto.find('importoSommeLiquidate').text + QUOTECHAR + DELIMITER
+  tailerRow = QUOTECHAR + lotto.find('importoAggiudicazione').text + QUOTECHAR + DELIMITER  
   inizio = lotto.find('tempiCompletamento').find('dataInizio')
   fine = lotto.find('tempiCompletamento').find('dataUltimazione')
   if ( inizio is not None):
@@ -120,8 +119,10 @@ for lotto in lotti.iter('lotto'):
     dataFine = convertiData(fine.text)
   else:
     dataFine = 'n/d'
-  headerRow += QUOTECHAR + dataInizio + QUOTECHAR + DELIMITER
-  headerRow += QUOTECHAR + dataFine + QUOTECHAR + DELIMITER
+  tailerRow += QUOTECHAR + dataInizio + QUOTECHAR + DELIMITER
+  tailerRow += QUOTECHAR + dataFine + QUOTECHAR + DELIMITER
+  tailerRow += QUOTECHAR + lotto.find('importoSommeLiquidate').text + QUOTECHAR + '\n'
+
   # dizionario vincitori
   dizionarioAggiudicatari = {}
   aggiudicatari=lotto.find('aggiudicatari')
@@ -156,11 +157,11 @@ for lotto in lotti.iter('lotto'):
       row += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER # raggruppamento
       row += QUOTECHAR + 'singolo' + QUOTECHAR + DELIMITER # ruolo
       if dizionarioAggiudicatari.has_key(cf):
-        row += QUOTECHAR + 'SI' + QUOTECHAR + '\n'
+        row += QUOTECHAR + 'SI' + QUOTECHAR + DELIMITER
       else:
-        row += QUOTECHAR + 'NO' + QUOTECHAR + '\n'
+        row += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER
       # scrivo
-      foutput.write(row)
+      foutput.write(row + tailerRow)
     # Raggruppamenti
     r = 0
     for raggruppamento in partecipanti.iter('raggruppamento'):
@@ -178,11 +179,11 @@ for lotto in lotti.iter('lotto'):
         row += QUOTECHAR + 'R' + str(r) + QUOTECHAR + DELIMITER # raggruppamento
         row += QUOTECHAR + membro.find('ruolo').text + QUOTECHAR + DELIMITER # ruolo
         if dizionarioAggiudicatari.has_key(cf):
-          row += QUOTECHAR + 'SI' + QUOTECHAR + '\n'
+          row += QUOTECHAR + 'SI' + QUOTECHAR + DELIMITER
         else:
-          row += QUOTECHAR + 'NO' + QUOTECHAR + '\n'
+          row += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER
         # scrivo
-        foutput.write(row)
+        foutput.write(row + tailerRow)
   else:
     # partecipanti assenti, scrivo solo i dati della gara
     foutput.write(headerRow +
@@ -191,6 +192,6 @@ for lotto in lotti.iter('lotto'):
                   QUOTECHAR + QUOTECHAR + DELIMITER +
                   QUOTECHAR + QUOTECHAR + DELIMITER +
                   QUOTECHAR + QUOTECHAR + DELIMITER +
-                  QUOTECHAR + QUOTECHAR + '\n')
-
+                  QUOTECHAR + QUOTECHAR + DELIMITER +
+                  tailerRow)
 foutput.close()
