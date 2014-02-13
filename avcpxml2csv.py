@@ -42,8 +42,8 @@ ND = 'n/d'
 
 # Leggo argomenti
 if len(sys.argv)!=2 :
-    print 'Specificare il nome del file contenete il tracciato record XML di AVCP'
-    print 'Esempio: ' + sys.argv[0] + 'avcp_dataset_2013.xml'
+    print ('Specificare il nome del file contenete il tracciato record XML di AVCP')
+    print ('Esempio: ' + sys.argv[0] + 'avcp_dataset_2013.xml')
     sys.exit(1)
 
 XML_INPUT=sys.argv[1]
@@ -52,7 +52,7 @@ try:
     tree = ET.parse(XML_INPUT)
     foutput = codecs.open(XML_INPUT + '.csv', 'w', encoding=CODIFICA_XML_SORGENTE)
 except IOError:
-    print 'Non posso aprire il file' + XML_INPUT
+    print ('Non posso aprire il file' + XML_INPUT)
     sys.exit(2)
 
 
@@ -154,7 +154,7 @@ for lotto in lotti.iter('lotto'):
         row += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER
       row += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER # raggruppamento
       row += QUOTECHAR + 'singolo' + QUOTECHAR + DELIMITER # ruolo
-      if dizionarioAggiudicatari.has_key(cf):
+      if cf in dizionarioAggiudicatari:
         row += QUOTECHAR + 'SI' + QUOTECHAR + DELIMITER
       else:
         row += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER
@@ -176,7 +176,7 @@ for lotto in lotti.iter('lotto'):
           row += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER
         row += QUOTECHAR + 'R' + str(r) + QUOTECHAR + DELIMITER # raggruppamento
         row += QUOTECHAR + membro.find('ruolo').text + QUOTECHAR + DELIMITER # ruolo
-        if dizionarioAggiudicatari.has_key(cf):
+        if cf in dizionarioAggiudicatari:
           row += QUOTECHAR + 'SI' + QUOTECHAR + DELIMITER
         else:
           row += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER
