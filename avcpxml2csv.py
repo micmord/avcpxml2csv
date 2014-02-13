@@ -121,27 +121,26 @@ for lotto in lotti.iter('lotto'):
   tailerRow += QUOTECHAR + dataFine + QUOTECHAR + DELIMITER
   tailerRow += QUOTECHAR + lotto.find('importoSommeLiquidate').text + QUOTECHAR + '\n'
 
-  # dizionario vincitori
-  dizionarioAggiudicatari = {}
+  # lista vincitori
+  listaAggiudicatari = []
   aggiudicatari=lotto.find('aggiudicatari')
   for aggiudicatario in aggiudicatari.iter('aggiudicatario'):
     if (aggiudicatario.find('codiceFiscale') is not None):
       cf = aggiudicatario.find('codiceFiscale').text
     else:
       cf = aggiudicatario.find('identificativoFiscaleEstero').text
-    dizionarioAggiudicatari[cf] = None
+    listaAggiudicatari.append(cf)
   for raggruppamento in aggiudicatari.iter('aggiudicatarioRaggruppamento'):
     for membro in raggruppamento.iter('membro'):
       if (membro.find('codiceFiscale') is not None):
         cf = membro.find('codiceFiscale').text
       else:
         cf = membro.find('identificativoFiscaleEstero').text
-      dizionarioAggiudicatari[cf] = None
+      listaAggiudicatari.append(cf)
   # partecipanti
   partecipanti=lotto.find('partecipanti')
   # se presenti li scrivo
   if ((partecipanti.find('partecipante') is not None) or (partecipanti.find('raggruppamento') is not None)):  
-    dizionarioPartecipanti = {}
     for partecipante in partecipanti.iter('partecipante'):
       row = headerRow + QUOTECHAR + partecipante.find('ragioneSociale').text.replace(QUOTECHAR,ESCAPE) + QUOTECHAR + DELIMITER
       if (partecipante.find('codiceFiscale') is not None):
@@ -154,7 +153,7 @@ for lotto in lotti.iter('lotto'):
         row += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER
       row += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER # raggruppamento
       row += QUOTECHAR + 'singolo' + QUOTECHAR + DELIMITER # ruolo
-      if cf in dizionarioAggiudicatari:
+      if cf in listaAggiudicatari:
         row += QUOTECHAR + 'SI' + QUOTECHAR + DELIMITER
       else:
         row += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER
@@ -176,7 +175,7 @@ for lotto in lotti.iter('lotto'):
           row += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER
         row += QUOTECHAR + 'R' + str(r) + QUOTECHAR + DELIMITER # raggruppamento
         row += QUOTECHAR + membro.find('ruolo').text + QUOTECHAR + DELIMITER # ruolo
-        if cf in dizionarioAggiudicatari:
+        if cf in listaAggiudicatari:
           row += QUOTECHAR + 'SI' + QUOTECHAR + DELIMITER
         else:
           row += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER
