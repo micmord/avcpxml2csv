@@ -80,8 +80,6 @@ def convertiData(data):
 
 # Radice del tracciato XML
 root = tree.getroot()
-# metadata tag
-metadata = root.find('metadata')
 
 # Heder CSV
 foutput.write(QUOTECHAR + 'CIG' + QUOTECHAR + DELIMITER +
