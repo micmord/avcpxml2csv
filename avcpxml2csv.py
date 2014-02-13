@@ -24,7 +24,7 @@ Specifiche XML:
 Tested with Python 2.7
 
 @author: Michele Mordenti
-@version: 0.1
+@version: 0.2-dev
 '''
 
 import sys
