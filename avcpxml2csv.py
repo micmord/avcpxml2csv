@@ -37,6 +37,7 @@ CODIFICA_XML_SORGENTE='utf-8'
 DELIMITER=';'
 QUOTECHAR='"'
 ESCAPE="'"
+SEP_DECIMALI=','
 ND = 'n/d'
 
 
@@ -93,10 +94,10 @@ foutput.write(QUOTECHAR + 'CIG' + QUOTECHAR + DELIMITER +
               QUOTECHAR + 'Raggruppamento' + QUOTECHAR + DELIMITER +
               QUOTECHAR + 'Ruolo' + QUOTECHAR + DELIMITER +
               QUOTECHAR + 'Aggiudicatario' + QUOTECHAR + DELIMITER +
-              QUOTECHAR + 'Importo' + QUOTECHAR + DELIMITER +
+              QUOTECHAR + 'Importo (\u20ac)' + QUOTECHAR + DELIMITER +
               QUOTECHAR + 'Data inizio' + QUOTECHAR + DELIMITER +
               QUOTECHAR + 'Data fine' + QUOTECHAR + DELIMITER +
-              QUOTECHAR + 'Liquidato' + QUOTECHAR + DELIMITER + '\n')
+              QUOTECHAR + 'Liquidato (\u20ac)' + QUOTECHAR + DELIMITER + '\n')
 
 lotti = root.find('data')
 # Ciclo principale su tutti i lotti
@@ -106,7 +107,7 @@ for lotto in lotti.iter('lotto'):
   headerRow += QUOTECHAR + lotto.find('strutturaProponente').find('codiceFiscaleProp').text + QUOTECHAR + DELIMITER
   headerRow += QUOTECHAR + lotto.find('oggetto').text.replace(QUOTECHAR,ESCAPE) + QUOTECHAR + DELIMITER
   headerRow += QUOTECHAR + lotto.find('sceltaContraente').text + QUOTECHAR + DELIMITER
-  tailerRow = QUOTECHAR + lotto.find('importoAggiudicazione').text + QUOTECHAR + DELIMITER  
+  tailerRow = lotto.find('importoAggiudicazione').text.replace('.',SEP_DECIMALI) + DELIMITER  
   inizio = lotto.find('tempiCompletamento').find('dataInizio')
   fine = lotto.find('tempiCompletamento').find('dataUltimazione')
   if ( inizio is not None):
@@ -119,7 +120,7 @@ for lotto in lotti.iter('lotto'):
     dataFine = 'n/d'
   tailerRow += QUOTECHAR + dataInizio + QUOTECHAR + DELIMITER
   tailerRow += QUOTECHAR + dataFine + QUOTECHAR + DELIMITER
-  tailerRow += QUOTECHAR + lotto.find('importoSommeLiquidate').text + QUOTECHAR + '\n'
+  tailerRow += lotto.find('importoSommeLiquidate').text.replace('.',SEP_DECIMALI) + '\n'
 
   # lista vincitori
   listaAggiudicatari = []
