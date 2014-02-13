@@ -21,7 +21,7 @@ Specifiche XML:
  * http://dati.avcp.it/schema/datasetAppaltiL190.xsd
  * http://dati.avcp.it/schema/TypesL190.xsd
 
-Tested with Python 2.7
+Tested with Python2.7 and Python3.3
 
 @author: Michele Mordenti
 @version: 0.2-dev
@@ -94,10 +94,10 @@ foutput.write(QUOTECHAR + 'CIG' + QUOTECHAR + DELIMITER +
               QUOTECHAR + 'Raggruppamento' + QUOTECHAR + DELIMITER +
               QUOTECHAR + 'Ruolo' + QUOTECHAR + DELIMITER +
               QUOTECHAR + 'Aggiudicatario' + QUOTECHAR + DELIMITER +
-              QUOTECHAR + 'Importo (\u20ac)' + QUOTECHAR + DELIMITER +
+              QUOTECHAR + u'Importo (\u20ac)' + QUOTECHAR + DELIMITER +
               QUOTECHAR + 'Data inizio' + QUOTECHAR + DELIMITER +
               QUOTECHAR + 'Data fine' + QUOTECHAR + DELIMITER +
-              QUOTECHAR + 'Liquidato (\u20ac)' + QUOTECHAR + DELIMITER + '\n')
+              QUOTECHAR + u'Liquidato (\u20ac)' + QUOTECHAR + DELIMITER + '\n')
 
 lotti = root.find('data')
 # Ciclo principale su tutti i lotti
@@ -143,53 +143,52 @@ for lotto in lotti.iter('lotto'):
   # se presenti li scrivo
   if ((partecipanti.find('partecipante') is not None) or (partecipanti.find('raggruppamento') is not None)):  
     for partecipante in partecipanti.iter('partecipante'):
-      row = headerRow + QUOTECHAR + partecipante.find('ragioneSociale').text.replace(QUOTECHAR,ESCAPE) + QUOTECHAR + DELIMITER
+      middleRow = QUOTECHAR + partecipante.find('ragioneSociale').text.replace(QUOTECHAR,ESCAPE) + QUOTECHAR + DELIMITER
       if (partecipante.find('codiceFiscale') is not None):
         cf = partecipante.find('codiceFiscale').text
-        row += QUOTECHAR + cf + QUOTECHAR + DELIMITER
-        row += QUOTECHAR + 'SI' + QUOTECHAR + DELIMITER
+        middleRow += QUOTECHAR + cf + QUOTECHAR + DELIMITER
+        middleRow += QUOTECHAR + 'SI' + QUOTECHAR + DELIMITER
       else:
         cf = partecipante.find('identificativoFiscaleEstero').text
-        row += QUOTECHAR + cf + QUOTECHAR + DELIMITER
-        row += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER
-      row += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER # raggruppamento
-      row += QUOTECHAR + 'singolo' + QUOTECHAR + DELIMITER # ruolo
+        middleRow += QUOTECHAR + cf + QUOTECHAR + DELIMITER
+        middleRow += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER
+      middleRow += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER # raggruppamento
+      middleRow += QUOTECHAR + 'singolo' + QUOTECHAR + DELIMITER # ruolo
       if cf in listaAggiudicatari:
-        row += QUOTECHAR + 'SI' + QUOTECHAR + DELIMITER
+        middleRow += QUOTECHAR + 'SI' + QUOTECHAR + DELIMITER
       else:
-        row += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER
+        middleRow += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER
       # scrivo
-      foutput.write(row + tailerRow)
+      foutput.write(headerRow + middleRow + tailerRow)
     # Raggruppamenti
     r = 0
     for raggruppamento in partecipanti.iter('raggruppamento'):
       r += 1 
       for membro in raggruppamento.iter('membro'):
-        row = headerRow + QUOTECHAR + membro.find('ragioneSociale').text.replace(QUOTECHAR,ESCAPE) + QUOTECHAR + DELIMITER
+        middleRow = QUOTECHAR + membro.find('ragioneSociale').text.replace(QUOTECHAR,ESCAPE) + QUOTECHAR + DELIMITER
         if (membro.find('codiceFiscale') is not None):
           cf = membro.find('codiceFiscale').text
-          row += QUOTECHAR + cf + QUOTECHAR + DELIMITER
-          row += QUOTECHAR + 'SI' + QUOTECHAR + DELIMITER    
+          middleRow += QUOTECHAR + cf + QUOTECHAR + DELIMITER
+          middleRow += QUOTECHAR + 'SI' + QUOTECHAR + DELIMITER    
         else:
           cf = membro.find('identificativoFiscaleEstero').text
-          row += QUOTECHAR + cf + QUOTECHAR + DELIMITER
-          row += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER
-        row += QUOTECHAR + 'R' + str(r) + QUOTECHAR + DELIMITER # raggruppamento
-        row += QUOTECHAR + membro.find('ruolo').text + QUOTECHAR + DELIMITER # ruolo
+          middleRow += QUOTECHAR + cf + QUOTECHAR + DELIMITER
+          middleRow += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER
+        middleRow += QUOTECHAR + 'R' + str(r) + QUOTECHAR + DELIMITER # raggruppamento
+        middleRow += QUOTECHAR + membro.find('ruolo').text + QUOTECHAR + DELIMITER # ruolo
         if cf in listaAggiudicatari:
-          row += QUOTECHAR + 'SI' + QUOTECHAR + DELIMITER
+          middleRow += QUOTECHAR + 'SI' + QUOTECHAR + DELIMITER
         else:
-          row += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER
+          middleRow += QUOTECHAR + 'NO' + QUOTECHAR + DELIMITER
         # scrivo
-        foutput.write(row + tailerRow)
+        foutput.write(headerRow + middleRow + tailerRow)
   else:
     # partecipanti assenti, scrivo solo i dati della gara
-    foutput.write(headerRow +
-                  QUOTECHAR + QUOTECHAR + DELIMITER +
-                  QUOTECHAR + QUOTECHAR + DELIMITER +
-                  QUOTECHAR + QUOTECHAR + DELIMITER +
-                  QUOTECHAR + QUOTECHAR + DELIMITER +
-                  QUOTECHAR + QUOTECHAR + DELIMITER +
-                  QUOTECHAR + QUOTECHAR + DELIMITER +
-                  tailerRow)
+    middleRow = (QUOTECHAR + QUOTECHAR + DELIMITER +
+                 QUOTECHAR + QUOTECHAR + DELIMITER +
+                 QUOTECHAR + QUOTECHAR + DELIMITER +
+                 QUOTECHAR + QUOTECHAR + DELIMITER +
+                 QUOTECHAR + QUOTECHAR + DELIMITER +
+                 QUOTECHAR + QUOTECHAR + DELIMITER)
+    foutput.write(headerRow + middleRow + tailerRow)
 foutput.close()
