@@ -51,7 +51,7 @@ XML_INPUT=sys.argv[1]
 
 try:
     tree = ET.parse(XML_INPUT)
-    foutput = codecs.open(XML_INPUT + '.csv', 'w', encoding=CODIFICA_XML_SORGENTE)
+    foutput = codecs.open(XML_INPUT.rstrip('.xml') + '.csv', 'w', encoding=CODIFICA_XML_SORGENTE)
 except IOError:
     print ('Non posso aprire il file' + XML_INPUT)
     sys.exit(2)
